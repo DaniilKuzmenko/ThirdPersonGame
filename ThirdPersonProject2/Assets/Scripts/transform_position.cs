@@ -12,6 +12,7 @@ private CharacterController controller;
 private const float SPEED = 4f;
 private float moveX, moveY, moveZ;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -69,4 +70,5 @@ private float moveX, moveY, moveZ;
         moveDir = new Vector3(moveX * Time.fixedDeltaTime, moveZ * Time.fixedDeltaTime);
         controller.Move(moveDir * SPEED);
     }
+    
 }

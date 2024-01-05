@@ -4,55 +4,118 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerailizeField]
+    [SerializeField]
     private Rigidbody rb;
     [SerializeField]
     private Animator animator;
 
-    private angleY, dizZ, jumpForce = 6f, turnSpeed = 80f;
+    private float angleY, dirZ, jumpForce = 6f, turnSpeed = 80f;
     private bool isGrounded;
     private Vector3 jumpDir;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     
-    void FixedUpdate(){
-        angleY = Input.GetAxis("MouseX") * Time.fixedDeltaTime * turnSpeed;
-        dizZ = Input.GetAxis("Vertical");
+    public GameObject sword;
+    private bool isSwordEquiped = false;
+
+    private void FixedUpdate()
+    {
+        angleY = Input.GetAxis("Mouse X") * Time.fixedDeltaTime * turnSpeed;
+        dirZ = Input.GetAxis("Vertical");
         transform.Rotate(new Vector3(0f, angleY, 0f));
     }
-    private void Update () {
-        if (isGrounded) {
-            if (Input.GetKeyDown (KeyCode. Space) ) {
-                Jump ();
-        } else {
-            animator.SetTrigger ("isLanded") ;
+
+    private void Update()
+    {
+        if (isGrounded)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
+            else
+            {
+                animator.SetTrigger("isLanded");
+            }
+            Move(dirZ, "isWalkForward", "isWalkBack");
+            Sprint();
+            Dodge();
+            EquipSword();
+        }
+        else
+        {
+            MoveInAir();
+        }
+    }
+
+    private void Jump()
+    {
+        animator.Play("Sword_Jump_Platformer_Start");
+        animator.applyRootMotion = false;
+        jumpDir = new Vector3(0f, jumpForce, dirZ * jumpForce / 2f);
+        jumpDir = transform.TransformDirection(jumpDir);
+        rb.AddForce(jumpDir, ForceMode.Impulse);
+        isGrounded = false;
+    }
+
+    private void Move(float dir, string paramName, string altParamName)
+    {
+        if(dir > 0)
+        {
+            animator.SetBool(paramName, true);
+        }
+        else if (dir < 0)
+        {
+            animator.SetBool(altParamName, true);
+        }
+        else
+        {
+            animator.SetBool(paramName, false);
+            animator.SetBool(altParamName, false);
         }
 
-        //Move (dirz, "isWalkForward", "isWalkBack") ;
-        //Sprint ();
-        //Dodge () ;
-    } else {
-        //MoveInAir ();
-}
-}
-    private void Jump() {
+    }
 
+    private void Sprint()
+    {
+        animator.SetBool("isRun", Input.GetKey(KeyCode.LeftShift));
     }
-    private void Move() {
-        
+
+    private void Dodge()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            animator.Play("Sword_Dodgle_Left");
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            animator.Play("Sword_Dodge_Right");
+        }
     }
-    private void Sprint() {
-        
+
+    private void MoveInAir()
+    {
+        if(new Vector2(rb.velocity.x, rb.velocity.z).magnitude < 1.1f)
+        {
+            jumpDir = new Vector3(0f, rb.velocity.y, dirZ);
+            jumpDir = transform.TransformDirection(jumpDir);
+            rb.velocity = jumpDir;
+        }
     }
-    private void Dodge() {
-        
+
+    private void OnCollisionEnter(Collision col)
+    {
+        isGrounded = true;
+        animator.applyRootMotion = true;
     }
-    private void MoveInAir() {
-        
+
+    public void EquipSword () {
+        sword.transform.SetParent(GameObject.Find("RightHand").transform);
+        if(Input.GetMouseButtonDown(0)) {
+            if (!isSwordEquiped) {
+                animator.Play ("Equip_Sword") ;
+                isSwordEquiped = true;
+            } else {
+                animator.Play("Sword_Attack_R");
+            }
+        }
     }
 }
