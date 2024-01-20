@@ -15,6 +15,19 @@ public class PlayerController : MonoBehaviour
     
     public GameObject sword;
     private bool isSwordEquiped = false;
+    private float lastAttackTime = 0;
+
+    private Vector3 swordStartPos = Vector3.zero;
+    private Vector3 swordStartRotation = Vector3.zero;
+    private void Start(){
+        swordStartPos = sword.transform.position;
+    }
+
+    private void Start()
+    {
+        swordStartPos = sword.transform.localPosition;
+        swordStartPotation = sword.transform.localEulerAngles;
+    }
 
     private void FixedUpdate()
     {
@@ -39,6 +52,7 @@ public class PlayerController : MonoBehaviour
             Sprint();
             Dodge();
             EquipSword();
+            UnequipSword();
         }
         else
         {
@@ -52,7 +66,7 @@ public class PlayerController : MonoBehaviour
         animator.applyRootMotion = false;
         jumpDir = new Vector3(0f, jumpForce, dirZ * jumpForce / 2f);
         jumpDir = transform.TransformDirection(jumpDir);
-        rb.AddForce(jumpDir, ForceMode.Impulse);
+        rb.AddForce(jumpDir = 50, ForceMode.Impulse);
         isGrounded = false;
     }
 
@@ -115,7 +129,39 @@ public class PlayerController : MonoBehaviour
                 isSwordEquiped = true;
             } else {
                 animator.Play("Sword_Attack_R");
+                lastAttackTime = Time.time;
             }
         }
     }
+
+    private void SwordHolster(){
+        sword.transform.SetParent(GameObject.Find("Hips").transform);
+        swordStartPos = sword.transform.position;
+        sword.transform.localEulerAngles = sword.StartRotation;
+    }
+
+    private void UnequipSword(){
+        if(isSwordEquiped && Time.time > lastAttackTime + 7f){
+            animator.Play("Sword_Holster");
+            isSwordEquiped = false;
+            SwordHolster();
+        }
+    }
+
+    void Attack () {
+        int rand = Random.Range (0, 3);
+        switch (rand) {
+            case 0:
+                animator. Play("Sword_Attack_1");
+                break;
+            case 1:
+                animator. Play ("Sword_Attack_2");
+                break;
+
+            case 2:
+            animator. Play ("Sword_Attack_3");
+                break;
+        }
+    }
+
 }
