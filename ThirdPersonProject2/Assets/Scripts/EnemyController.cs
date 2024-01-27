@@ -15,6 +15,8 @@ public class EnemyController : MonoBehaviour
     private Transform[] patrolTargets;
     private int currentTargetIndex = 0;
     public bool isAttacked = false;
+    [HideinInspector]
+    public bool isAttacking = false;
     
 
     void Start()
@@ -45,6 +47,7 @@ public class EnemyController : MonoBehaviour
         } else {
             //moveToPlayer
         }
+        isAttacking = 
     }
    }
    private void moveToPlayer(){
@@ -73,8 +76,44 @@ public class EnemyController : MonoBehaviour
     CheckNewPatrolTarget();
 }
     private void CheckNewPatrolTarget(){
-        
+        Vector3 targetPos = patrolTargets[currentTargetIndex].position;
+        if(Vector3.Distance(transform.position,targetPos) < 0.5f) {
+        if(currentTargetIndex < patrolTargets.Length -1) {
+        currentTargetIndex++;
+
+        } else {
+
+            currentTargetIndex = 0;
+        }
+}
     }
+    private void OnTriggerEnter(Collider col)
+{
+        if (col.gameObject.tag == "Weapon" &&
+            Time.time > prevHitTime + ignoreDamageWindow &&
+            PlayerController.instance.isAttacking)
+        {
+            health --;
+            prevHitTime = Time.time;
+            if (health > 1){
+
+                animator.Play("KnockdownRight");
+
+            } else if (health == 1) {
+
+                animator.Play("Sword_Defeat_1_Start");
+
+            } else {
+
+                animator.SetTrigger("isDead");
+            }
+
+{
+
+}
+
+}
+}
 }
 
    

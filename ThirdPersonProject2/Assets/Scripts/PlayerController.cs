@@ -19,6 +19,11 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 swordStartPos = Vector3.zero;
     private Vector3 swordStartRotation = Vector3.zero;
+    [SerializeField]
+    private EnemyController enemy;
+
+    private static int a;
+    private int b;
     private void Start(){
         swordStartPos = sword.transform.position;
     }
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        isAttacking = animator.GetCurrentANimatorStateInfo(0).IsName("Sword_hit_R");
         if (isGrounded)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -58,6 +64,7 @@ public class PlayerController : MonoBehaviour
         {
             MoveInAir();
         }
+
     }
 
     private void Jump()
@@ -161,6 +168,11 @@ public class PlayerController : MonoBehaviour
             case 2:
             animator. Play ("Sword_Attack_3");
                 break;
+        }
+    }
+    private void OnTriggerEnter(Collider col){
+        if (col.gameObject.tag == "Weapon"  && enemyIsAttacking){
+            animator.Play("Sword_Hit_L_2")
         }
     }
 
